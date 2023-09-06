@@ -9,6 +9,7 @@ plugins {
 	id("io.spring.dependency-management") version "1.0.11.RELEASE"
 	id("org.sonarqube") version "3.0"
 	id("net.linguica.maven-settings") version "0.5"
+	id("org.flywaydb.flyway") version "8.2.0"
 	java
 	jacoco
 }
@@ -59,9 +60,13 @@ dependencies {
 	implementation("com.pharmeasy:micro-service-util:${property("utilsVersion")}")
 	implementation("com.pharmeasy:tenancy-util:${property("utilsVersion")}")
 	implementation("mysql:mysql-connector-java:${property("mysqlVersion")}")
+	implementation("org.flywaydb:flyway-core:8.2.2")
+	implementation("org.flywaydb:flyway-sqlserver:8.2.2")
+	testImplementation("org.flywaydb.flyway-test-extensions:flyway-spring-test:7.0.0")
 	compileOnly("org.projectlombok:lombok")
+	compileOnly("org.flywaydb:flyway-core")
 	runtimeOnly("com.h2database:h2")
-	runtimeOnly("com.mysql:mysql-connector-j")
+	runtimeOnly("org.flywaydb:flyway-core")
 	annotationProcessor("org.projectlombok:lombok")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 }
@@ -86,4 +91,60 @@ tasks.withType<KotlinCompile> {
 
 tasks.withType<Test> {
 	useJUnitPlatform()
+}
+
+flyway {
+	driver = "com.mysql.cj.jdbc.Driver"
+	url = "jdbc:mysql://127.0.0.1"
+	user = "springstudent"
+	password = "springstudent"
+	baselineOnMigrate = true
+	schemas = arrayOf("t1","t2","t3","t4")
+}
+
+tasks.register("migratet1", org.flywaydb.gradle.task.FlywayMigrateTask::class) {
+	description = "Migrate t1"
+	url = "jdbc:mysql://127.0.0.1"
+	user = "springstudent"
+	password = "springstudent"
+	schemas = arrayOf("t1")
+	baselineOnMigrate = true
+	locations = arrayOf("filesystem:src/main/resources/db/migration")
+	dependsOn("classes")
+}
+
+tasks.register("migratet2", org.flywaydb.gradle.task.FlywayMigrateTask::class) {
+	description = "Migrate t2"
+	url = "jdbc:mysql://127.0.0.1/t2"
+	user = "springstudent"
+	password = "springstudent"
+	schemas = arrayOf("t2")
+	baselineOnMigrate = true
+	table = "flyway_1"
+	locations = arrayOf("filesystem:src/main/resources/db/migration")
+	dependsOn("classes")
+}
+
+tasks.register("migratet3", org.flywaydb.gradle.task.FlywayMigrateTask::class) {
+	description = "Migrate t3"
+	url = "jdbc:mysql://127.0.0.1/t3"
+	user = "springstudent"
+	password = "springstudent"
+	schemas = arrayOf("t3")
+	baselineOnMigrate = true
+	table = "flyway_1"
+	locations = arrayOf("filesystem:src/main/resources/db/migration")
+	dependsOn("classes")
+}
+
+tasks.register("migratet4", org.flywaydb.gradle.task.FlywayMigrateTask::class) {
+	description = "Migrate t4"
+	url = "jdbc:mysql://127.0.0.1/t4"
+	user = "springstudent"
+	password = "springstudent"
+	baselineOnMigrate = true
+	schemas = arrayOf("t4")
+	table = "flyway_1"
+	locations = arrayOf("filesystem:src/main/resources/db/migration")
+	dependsOn("classes")
 }
