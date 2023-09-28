@@ -60,6 +60,7 @@ dependencies {
 	implementation("com.pharmeasy:micro-service-util:${property("utilsVersion")}")
 	implementation("com.pharmeasy:tenancy-util:${property("utilsVersion")}")
 	implementation("mysql:mysql-connector-java:${property("mysqlVersion")}")
+	implementation("mysql:mysql-connector-java:8.0.26")
 	implementation("org.flywaydb:flyway-core:8.2.2")
 	implementation("org.flywaydb:flyway-sqlserver:8.2.2")
 	testImplementation("org.flywaydb.flyway-test-extensions:flyway-spring-test:7.0.0")
@@ -102,49 +103,13 @@ flyway {
 	schemas = arrayOf("t1","t2","t3","t4")
 }
 
-tasks.register("migratet1", org.flywaydb.gradle.task.FlywayMigrateTask::class) {
-	description = "Migrate t1"
+tasks.register("flyway_migrate_tenant", org.flywaydb.gradle.task.FlywayMigrateTask::class) {
+	val tenant = project.findProperty("tenant") as String?
 	url = "jdbc:mysql://127.0.0.1"
 	user = "springstudent"
 	password = "springstudent"
-	schemas = arrayOf("t1")
+	schemas = arrayOf(tenant)
 	baselineOnMigrate = true
-	locations = arrayOf("filesystem:src/main/resources/db/migration")
-	dependsOn("classes")
-}
-
-tasks.register("migratet2", org.flywaydb.gradle.task.FlywayMigrateTask::class) {
-	description = "Migrate t2"
-	url = "jdbc:mysql://127.0.0.1/t2"
-	user = "springstudent"
-	password = "springstudent"
-	schemas = arrayOf("t2")
-	baselineOnMigrate = true
-	table = "flyway_1"
-	locations = arrayOf("filesystem:src/main/resources/db/migration")
-	dependsOn("classes")
-}
-
-tasks.register("migratet3", org.flywaydb.gradle.task.FlywayMigrateTask::class) {
-	description = "Migrate t3"
-	url = "jdbc:mysql://127.0.0.1/t3"
-	user = "springstudent"
-	password = "springstudent"
-	schemas = arrayOf("t3")
-	baselineOnMigrate = true
-	table = "flyway_1"
-	locations = arrayOf("filesystem:src/main/resources/db/migration")
-	dependsOn("classes")
-}
-
-tasks.register("migratet4", org.flywaydb.gradle.task.FlywayMigrateTask::class) {
-	description = "Migrate t4"
-	url = "jdbc:mysql://127.0.0.1/t4"
-	user = "springstudent"
-	password = "springstudent"
-	baselineOnMigrate = true
-	schemas = arrayOf("t4")
-	table = "flyway_1"
 	locations = arrayOf("filesystem:src/main/resources/db/migration")
 	dependsOn("classes")
 }
